@@ -1,7 +1,42 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import '@geoman-io/leaflet-geoman-free';
 import '@geoman-io/leaflet-geoman-free/dist/leaflet-geoman.css';
+import 'leaflet/dist/leaflet.css';
+
+// Component to initialize Geoman controls
+const GeomanControls = () => {
+  const map = useMap();
+
+  useEffect(() => {
+    // Add Geoman controls
+    map.pm.addControls({
+      position: 'topleft',
+      drawCircleMarker: false,
+      drawPolyline: true,
+      drawRectangle: true,
+      drawPolygon: true,
+      drawCircle: false,
+      editMode: true,
+      dragMode: true,
+      cutPolygon: false,
+      removalMode: true,
+    });
+
+    // Listen to draw events
+    map.on('pm:create', (e) => {
+      console.log('Shape created:', e.layer.toGeoJSON());
+      // Here we would dispatch to Zustand/Context to show the property panel
+      // and eventually POST to /api/features
+    });
+
+    return () => {
+      map.pm.removeControls();
+    };
+  }, [map]);
+
+  return null;
+};
 
 const SiteMap = () => {
   const defaultCenter = [-33.8688, 151.2093]; // Sydney CBD as default
@@ -12,7 +47,10 @@ const SiteMap = () => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      {/* Sample Marker */}
+      
+      <GeomanControls />
+
+      {/* Sample Marker (BH01) */}
       <Marker position={[-33.8688, 151.2093]}>
         <Popup>
           <strong>BH01</strong><br />

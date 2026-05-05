@@ -1,7 +1,12 @@
-﻿from fastapi import FastAPI
+from fastapi import FastAPI
+from app.core.db import init_db
 
 app = FastAPI(title="AutoSoil Logger Map1 API")
 
-@app.get(/")
+@app.on_event("startup")
+def on_startup():
+    init_db()
+
+@app.get("/")
 def read_root():
-    return {"message": "Welcome to Map1 API"}
+    return {"message": "Map1 Backend is running."}

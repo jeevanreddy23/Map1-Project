@@ -198,23 +198,3 @@ The optional CrewAI prototype is in [crewai/](crewai/). It defines:
 5. QA agent: mobile layout testing, GeoJSON validation, CSV round-trip tests, field-user workflow review.
 6. Integration agent: connect marker IDs to AutoSoil Logger logs, PDFs, and GINT-style structured exports.
 
-## Cursor/Codex Repo Generation Prompt
-
-```text
-Build the `map1` repository for AutoSoil Logger.
-
-Create a production-ready starter implementation using React + Vite, React-Leaflet, Leaflet Draw, FastAPI, GeoJSON, CSV import/export, and a PostgreSQL/PostGIS-ready schema.
-
-The product is not a generic map app. It is a geotechnical site investigation map for Australian AS1726-style workflows. Users must be able to add boreholes, DCPs, test pits, sample points, site boundaries, access paths, and exclusion zones. Boreholes require metadata including ID, coordinates, RL, depth, dates, drilling method, logged by, water level, remarks, linked PDF, and linked structured log data.
-
-Keep the MVP simple, professional, mobile-friendly, and easy to extend. Use WGS84 now, preserve structure for MGA/GDA2020, manual coordinate entry, uploaded site plan overlays, calibration anchors, offline field mode, and AutoSoil Logger reporting integration.
-
-Deliver:
-- clear README
-- frontend starter app
-- backend starter API
-- PostGIS schema
-- example CSV and GeoJSON
-- roadmap and agent development plan
-- sensible tests or validation hooks where practical
-```

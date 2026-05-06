@@ -95,7 +95,6 @@ Copy `.env.example` when wiring local services. The MVP backend currently uses i
 map1/
   frontend/           React + Vite map client
   backend/            FastAPI API
-  crewai/             Optional 3-agent prototype crew
   database/           PostGIS schema and seed notes
   docs/               Architecture, API, prompts, roadmap
   examples/           Example CSV and GeoJSON files
@@ -183,18 +182,16 @@ type,id,latitude,longitude,easting,northing,zone,surface_rl,total_depth,start_da
 borehole,BH01,-33.8688,151.2093,,,,12.4,8.5,2026-05-06,2026-05-06,Solid flight auger,J Smith,2.1,Near existing slab,
 ```
 
-## Swarm-Agent Development Plan
+## OpenGeoAgent Development Plan
 
-The optional CrewAI prototype is in [crewai/](crewai/). It defines:
+Map1 uses an OpenGeoAgent-style specialist workflow for geospatial decisions instead of a generic multi-agent crew. The specialist focuses on coordinate correctness, site-plan calibration, GeoJSON/PostGIS interchange, and Australian geotechnical map workflows.
 
-- Architect Agent: React/Leaflet frontend implementation.
-- GIS Agent: affine transform and coordinate calibration design.
-- QA Agent: API, GeoJSON, CSV, and GitHub readiness checks.
+See [docs/opengeoagent-development-plan.md](docs/opengeoagent-development-plan.md).
 
-1. Frontend map agent: implement placement modes, marker labels, side panel editing, drawing UX.
-2. Backend API agent: implement FastAPI routes, validation, GeoJSON serialization, CSV import/export.
-3. Database agent: convert in-memory API to SQLAlchemy/PostGIS persistence.
-4. Calibration agent: implement overlay upload, anchor capture, similarity/affine transforms, residual reporting.
-5. QA agent: mobile layout testing, GeoJSON validation, CSV round-trip tests, field-user workflow review.
-6. Integration agent: connect marker IDs to AutoSoil Logger logs, PDFs, and GINT-style structured exports.
+1. Geospatial specialist: define CRS strategy, calibration methods, transform validation, and residual reporting.
+2. Frontend map implementation: apply the specialist guidance to React/Leaflet marker placement, overlays, and drawing tools.
+3. Backend API implementation: expose GeoJSON, CSV, calibration, overlay, and project persistence endpoints.
+4. Database implementation: convert in-memory storage to SQLAlchemy/PostGIS.
+5. QA implementation: verify coordinate transforms, GeoJSON validity, CSV round trips, and mobile field workflows.
+6. AutoSoil Logger integration: connect marker IDs to borehole logs, DCP reports, PDFs, and GINT-style structured exports.
 

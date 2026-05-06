@@ -1,0 +1,30 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [151.2093, -33.8688]
+      },
+      "properties": {
+        "id": "example-bh01",
+        "feature_type": "borehole",
+        "label": "BH01",
+        "borehole_id": "BH01",
+        "coordinate_system": "WGS84",
+        "latitude": -33.8688,
+        "longitude": 151.2093,
+        "surface_rl": 12.4,
+        "total_depth": 8.5,
+        "drilling_method": "Solid flight auger",
+        "logged_by": "J Smith",
+        "water_level": 2.1,
+        "remarks": "Near existing slab",
+        "linked_log_pdf": null,
+        "linked_gint_data": null
+      }
+    }
+  ]
+}
+

@@ -1,0 +1,229 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: #172022;
+  background: #eef2f1;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  min-height: 100vh;
+}
+
+.map-section {
+  position: relative;
+  min-width: 0;
+}
+
+.map {
+  height: 100vh;
+  width: 100%;
+}
+
+.top-strip {
+  position: absolute;
+  z-index: 500;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  color: #10201f;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+}
+
+.top-strip div {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+
+.top-strip span {
+  color: #52605f;
+  font-size: 0.88rem;
+}
+
+.toolbar {
+  position: absolute;
+  z-index: 500;
+  left: 14px;
+  bottom: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: min(760px, calc(100% - 28px));
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
+}
+
+.toolbar button,
+.button-like {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 12px;
+  color: #263331;
+  background: #ffffff;
+  border: 1px solid #cfd8d6;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.toolbar button.active {
+  color: #ffffff;
+  background: #0f766e;
+  border-color: #0f766e;
+}
+
+.button-like input {
+  display: none;
+}
+
+.map1-marker {
+  display: block;
+  width: 22px;
+  height: 22px;
+  background: color-mix(in srgb, var(--marker-color) 78%, white);
+  border: 3px solid #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--marker-color) 35%, transparent), 0 6px 18px rgba(15, 23, 42, 0.24);
+}
+
+.map1-marker.selected {
+  animation: pulse 1.25s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--marker-color) 35%, transparent), 0 6px 18px rgba(15, 23, 42, 0.24);
+  }
+  50% {
+    box-shadow: 0 0 0 10px color-mix(in srgb, var(--marker-color) 18%, transparent), 0 6px 18px rgba(15, 23, 42, 0.24);
+  }
+}
+
+.editor {
+  min-height: 100vh;
+  padding: 22px;
+  background: #fbfcfc;
+  border-left: 1px solid #d7dfdd;
+  overflow: auto;
+}
+
+.editor.empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.editor-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  display: block;
+  color: #60706d;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+h2 {
+  margin: 2px 0 0;
+  font-size: 1.35rem;
+}
+
+.icon-button {
+  width: 34px;
+  height: 34px;
+  color: #33403e;
+  background: #eef2f1;
+  border: 1px solid #cfd8d6;
+  border-radius: 7px;
+}
+
+.field-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.field-grid label {
+  display: grid;
+  gap: 5px;
+}
+
+.field-grid span {
+  color: #53615f;
+  font-size: 0.82rem;
+  text-transform: capitalize;
+}
+
+.field-grid input {
+  width: 100%;
+  min-height: 39px;
+  padding: 8px 10px;
+  color: #172022;
+  background: #ffffff;
+  border: 1px solid #c7d1cf;
+  border-radius: 7px;
+}
+
+.leaflet-tooltip {
+  border: 0;
+  border-radius: 5px;
+  color: #10201f;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.16);
+}
+
+@media (max-width: 860px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .map {
+    height: 68vh;
+  }
+
+  .editor {
+    min-height: 32vh;
+    border-left: 0;
+    border-top: 1px solid #d7dfdd;
+  }
+
+  .top-strip {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .toolbar {
+    right: 14px;
+  }
+}
+

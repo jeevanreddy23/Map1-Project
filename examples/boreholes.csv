@@ -1,0 +1,4 @@
+type,id,latitude,longitude,easting,northing,zone,surface_rl,total_depth,start_date,end_date,method,logged_by,water_level,remarks,linked_log_pdf
+borehole,BH01,-33.8688000,151.2093000,,,,12.4,8.5,2026-05-06,2026-05-06,Solid flight auger,J Smith,2.1,Near existing slab,
+borehole,BH02,-33.8686200,151.2095100,,,,12.7,10.0,2026-05-06,2026-05-07,Wash boring,A Lee,2.4,Adjacent access road,
+

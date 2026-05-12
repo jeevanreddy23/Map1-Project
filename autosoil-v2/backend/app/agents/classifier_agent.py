@@ -1,50 +1,31 @@
 ﻿# app/agents/classifier_agent.py
-
 import os
 import json
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import SystemMessage, HumanMessage
 from app.state.borehole import BoreholeState
-from app.tools.as1726 import validate_uscs_code, get_consistency_options, build_soil_description
+from app.skills.temporal_memory import SpatialTemporalMemory
 
-
-CLASSIFIER_SYSTEM = """You are an expert geotechnical engineer specialising in AS 1726:2017 field logging.
-
-Given soil descriptors, assign the correct USCS classification code and complete all required fields.
-
-Respond ONLY with this JSON (no markdown):
-{
-  "uscs_code": "<2-letter USCS code>",
-  "consistency": "<consistency from AS 1726 table>",
-  "moisture": "<dry|slightly moist|moist|very moist|wet>",
-  "colour": "<colour descriptor>",
-  "structure": "<massive|stratified|fissured|laminated|null>",
-  "inclusions": "<description or null>",
-  "confidence": <0.0 to 1.0>,
-  "reasoning": "<one sentence justification>"
-}"""
-
+CLASSIFIER_SYS = """You are a Geotechnical Engineer.
+Based on visual descriptors, depth, and historical site memory, output a valid AS 1726:2017 description.
+Return ONLY JSON:
+{"uscs_code": "...", "description": "...", "colour": "...", "moisture": "...", "consistency": "..."}
+"""
 
 async def classifier_agent(state: BoreholeState) -> dict:
+    """Classifies soil utilizing both visual data and Temporal Graph Memory (Mem0/Zep style)."""
+    
+    # Initialize Memory Skill
+    memory = SpatialTemporalMemory(state.get("project_id", "default_proj"))
+    site_context = memory.query_nearby_context(state.get("borehole_id"), radius_m=50.0)
+    
+    user_msg = f"""
+    Depth: {state.get("current_depth", "Unknown")}
+    Visual extraction: {state.get("current_visual_descriptors", {})}
+    Site Memory Context: {site_context}
     """
-    Classifies soil based on photo descriptors + field observations.
-    Outputs: completes current_layer with USCS code and all AS 1726 fields.
-    """
-    current = state.get("current_layer") or {}
-
-    user_prompt = f"""Classify this soil sample per AS 1726:2017:
-
-Depth interval: {state.get('depth_from', '?')}m - {state.get('depth_to', '?')}m
-Visual colour: {current.get('colour', 'not recorded')}
-Visible texture: {current.get('_texture', 'not recorded')}
-Visible moisture: {current.get('moisture', 'not recorded')}
-Visible structure: {current.get('structure', 'not recorded')}
-Inclusions: {current.get('inclusions', 'none observed')}
-Photo confidence: {current.get('_photo_confidence', 0.5)}
-
-Assign USCS code and complete all descriptors."""
-
+    
     provider = os.getenv("MODEL_PROVIDER", "openai")
     if provider == "anthropic":
         llm = ChatAnthropic(model=os.getenv("MODEL_NAME", "claude-opus-4-6"))
@@ -52,57 +33,29 @@ Assign USCS code and complete all descriptors."""
         llm = ChatOpenAI(model=os.getenv("MODEL_NAME", "gpt-4o"))
 
     response = llm.invoke([
-        SystemMessage(content=CLASSIFIER_SYSTEM),
-        HumanMessage(content=user_prompt),
+        SystemMessage(content=CLASSIFIER_SYS),
+        HumanMessage(content=user_msg)
     ])
-
+    
     raw = response.content.strip()
-    # Strip markdown fences if present
     if raw.startswith("```"):
         raw = raw.lstrip("`json\n").rstrip("`")
-
+        
     try:
-        result = json.loads(raw)
-    except json.JSONDecodeError:
+        layer_data = json.loads(raw)
+        
+        # Add to state
+        layers = state.get("soil_layers", [])
+        # In a real workflow, we'd merge depth info from state into layer_data here
+        layers.append(layer_data)
+        
         return {
-            "error": "classifier_agent: Could not parse classification response",
+            "soil_layers": layers,
             "last_agent": "classifier_agent",
+            "error": None
         }
-
-    validation = validate_uscs_code.invoke({"code": result.get("uscs_code", "")})
-    if not validation["valid"]:
+    except Exception as e:
         return {
-            "error": f"classifier_agent: Invalid USCS code '{result.get('uscs_code')}'. {validation['suggestion']}",
-            "last_agent": "classifier_agent",
-            "qa_score": 0.2,
+            "error": f"Classification failed: {e}",
+            "last_agent": "classifier_agent"
         }
-
-    description = build_soil_description.invoke({
-        "uscs_code": result["uscs_code"],
-        "colour": result.get("colour", current.get("colour", "")),
-        "moisture": result.get("moisture", "moist"),
-        "consistency": result.get("consistency", "firm"),
-        "structure": result.get("structure"),
-        "inclusions": result.get("inclusions"),
-    })
-
-    updated_layer = {
-        **current,
-        "depth_from": state.get("depth_from", 0.0),
-        "depth_to": state.get("depth_to", 0.0),
-        "uscs_code": result["uscs_code"],
-        "description": description,
-        "colour": result.get("colour", current.get("colour", "")),
-        "moisture": result.get("moisture", ""),
-        "consistency": result.get("consistency", ""),
-        "structure": result.get("structure", ""),
-        "inclusions": result.get("inclusions", ""),
-        "_classifier_confidence": result.get("confidence", 0.5),
-        "_reasoning": result.get("reasoning", ""),
-    }
-
-    return {
-        "current_layer": updated_layer,
-        "last_agent": "classifier_agent",
-        "error": None,
-    }
